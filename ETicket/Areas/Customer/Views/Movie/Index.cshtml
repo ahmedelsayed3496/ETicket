@@ -1,0 +1,107 @@
+﻿@model IEnumerable<Movie>
+
+@using ETicket.Data.Enums
+@{
+    ViewData["Title"] = "Movies";
+    var random = new Random();
+    var today = DateTime.Today;
+
+    // Select a random movie that is NOT expired
+    var featuredMovie = Model
+        .Where(m => m.EndDate >= today) // Only non-expired movies
+        .OrderBy(m => random.Next())
+        .FirstOrDefault();
+}
+
+<!-- Bootstrap container -->
+<div class="container mt-4">
+
+    <!-- Featured Movie Section -->
+    @if (featuredMovie != null)
+    {
+        var featuredStatus = featuredMovie.StartDate > today ? MovieStatus.Upcoming
+        : (featuredMovie.EndDate >= today ? MovieStatus.Available : MovieStatus.Expired);
+
+        <div class="position-relative mb-5">
+            <div class="position-absolute top-0 end-0 p-2">
+                <span class="badge @(featuredStatus == MovieStatus.Available ? "bg-success" : featuredStatus == MovieStatus.Upcoming ? "bg-warning" : "bg-danger") fs-6 p-2">
+                    @(featuredStatus == MovieStatus.Available ? "Available" : featuredStatus == MovieStatus.Upcoming ? "Upcoming" : "Expired")
+                </span>
+            </div>
+            <img src="~/images/movies/@featuredMovie.ImgUrl" class="img-fluid w-100" alt="@featuredMovie.Name" style="max-height: 500px; object-fit: cover; border-radius: 10px;">
+            <div class="position-absolute top-50 start-50 translate-middle text-center text-white bg-dark bg-opacity-75 p-4 rounded w-75">
+                <h2 class="fw-bold">@featuredMovie.Name</h2>
+                <p class="fw-bold">Price: $@featuredMovie.Price</p>
+                <p>
+                    <strong>Cinema:</strong>
+                    <a asp-controller="Cinema" asp-action="Movies" asp-route-CinemaId="@featuredMovie.Cinema.Id" class="text-decoration-none">
+                        <span class="badge bg-primary">@featuredMovie.Cinema.Name</span>
+                    </a>
+                </p>
+                <p><small>Start Date: @featuredMovie.StartDate.ToString("MMMM dd, yyyy")</small></p>
+                <p><small>End Date: @featuredMovie.EndDate.ToString("MMMM dd, yyyy")</small></p>
+                <p>
+                    <strong>Category:</strong>
+                    <a asp-controller="Category" asp-action="Movies" asp-route-CategoryId="@featuredMovie.Category.Id" class="text-decoration-none">
+                        <span class="badge bg-dark">@featuredMovie.Category.Name</span>
+                    </a>
+                </p>
+                <a href="#" class="btn btn-primary btn-lg me-2">Get Your Ticket</a>
+                <a asp-controller="Movie" asp-action="Details" asp-route-MovieId="@featuredMovie.Id"
+                   class="btn btn-outline-light btn-lg">Details</a>
+            </div>
+        </div>
+    }
+
+    <!-- Movie List -->
+    <h2 class="text-center text-light mb-4">Movies</h2>
+    <div class="row">
+        @foreach (var movie in Model)
+        {
+            var movieStatus = movie.StartDate > today ? MovieStatus.Upcoming
+            : (movie.EndDate >= today ? MovieStatus.Available : MovieStatus.Expired);
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 position-relative">
+                    <!-- Status Badge -->
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge @(movieStatus == MovieStatus.Available ? "bg-success" : movieStatus == MovieStatus.Upcoming ? "bg-warning" : "bg-danger") fs-6 p-2">
+                            @(movieStatus == MovieStatus.Available ? "Available" : movieStatus == MovieStatus.Upcoming ? "Upcoming" : "Expired")
+                        </span>
+                    </div>
+
+                    <!-- Movie Image -->
+                    <img src="~/images/movies/@movie.ImgUrl" class="card-img-top" alt="@movie.Name" style="height: 250px; object-fit: cover;">
+
+                    <div class="card-body">
+                        <h5 class="card-title">@movie.Name</h5>
+                        <p>
+                            <strong>Cinema:</strong>
+                            <a asp-controller="Cinema" asp-action="Movies" asp-route-CinemaId="@movie.Cinema.Id" class="text-decoration-none">
+                                <span class="badge bg-primary">@movie.Cinema.Name</span>
+                            </a>
+                        </p>
+                        <p class="fw-bold">Price: $@movie.Price</p>
+                        <p><small class="text-muted">Start Date: @movie.StartDate.ToString("MMMM dd, yyyy")</small></p>
+                        <p><small class="text-muted">End Date: @movie.EndDate.ToString("MMMM dd, yyyy")</small></p>
+                        <p>
+                            <strong>Category:</strong>
+                            <a asp-controller="Category" asp-action="Movies" asp-route-CategoryId="@movie.Category.Id" class="text-decoration-none">
+                                <span class="badge bg-dark">@movie.Category.Name</span>
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Card Footer (Buttons) -->
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="#" class="btn @(movieStatus == MovieStatus.Expired ? "btn-secondary disabled" : "btn-primary") w-50 me-2">Get Ticket</a>
+                        <a asp-controller="Movie" asp-action="Details" asp-route-MovieId="@movie.Id"
+                           class="btn btn-outline-primary w-50">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

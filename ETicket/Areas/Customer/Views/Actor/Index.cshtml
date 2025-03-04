@@ -1,0 +1,32 @@
+﻿@model IEnumerable<ETicket.Models.Actor>
+
+@{
+    ViewData["Title"] = "Actors";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Actors</h1>
+    <div class="row">
+        @foreach (var actor in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center shadow-sm">
+                    <img src="@Url.Content($"~/images/cast/{actor.ProfilePicture}")" class="card-img-top"
+                         alt="@actor.FirstName @actor.LastName" style="height: 250px; object-fit: cover;">
+
+                    <div class="card-body">
+                        <h5 class="card-title">@actor.FirstName @actor.LastName</h5>
+                        <p class="card-text text-truncate" style="max-height: 60px; overflow: hidden;">@actor.Bio</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <a asp-controller="Actor" asp-action="Works" asp-route-ActorId="@actor.Id"
+                           class="btn btn-outline-primary w-100">
+                            View Works
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

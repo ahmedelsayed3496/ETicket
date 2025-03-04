@@ -1,0 +1,58 @@
+﻿@model IEnumerable<ETicket.Models.Movie>
+
+@{
+    ViewData["Title"] = $"Movies in {ViewBag.Category.Name}";
+}
+
+<div class="container mt-5">
+    <!-- Category Name as Header -->
+    <h1 class="text-center">@ViewBag.Category.Name - Movies</h1>
+
+    <!-- Movie List -->
+    <div class="row">
+        @foreach (var movie in Model)
+        {
+            var movieStatus = movie.EndDate < DateTime.Now ? "Expired" : "Now Showing";
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 position-relative">
+                    <!-- Status Badge -->
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge @(movie.EndDate < DateTime.Now ? "bg-danger" : "bg-success") fs-6 p-2">
+                            @movieStatus
+                        </span>
+                    </div>
+
+                    <!-- Movie Image -->
+                    <img src="@Url.Content($"~/images/movies/{movie.ImgUrl}")" class="card-img-top" alt="@movie.Name" style="height: 250px; object-fit: cover;">
+
+                    <div class="card-body">
+                        <h5 class="card-title">@movie.Name</h5>
+
+                        <!-- Clickable Cinema -->
+                        <p>
+                            <strong>Cinema:</strong>
+                            <a asp-controller="Cinema" asp-action="Movies" asp-route-CinemaId="@movie.Cinema.Id"
+                               class="badge bg-primary text-decoration-none">
+                                @movie.Cinema.Name
+                            </a>
+                        </p>
+
+                        <p><strong>Price:</strong> $@movie.Price</p>
+                        <p><small>Start Date: @movie.StartDate.ToString("MMMM dd, yyyy")</small></p>
+                        <p><small>End Date: @movie.EndDate.ToString("MMMM dd, yyyy")</small></p>
+                    </div>
+
+                    <!-- Card Footer (Buttons) -->
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="#" class="btn @(movie.EndDate < DateTime.Now ? "btn-secondary disabled" : "btn-primary") w-50 me-2">Get Ticket</a>
+                        <a asp-controller="Movie" asp-action="Details" asp-route-MovieId="@movie.Id"
+                           class="btn btn-outline-primary w-50">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

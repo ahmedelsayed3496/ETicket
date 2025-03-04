@@ -1,0 +1,32 @@
+﻿@model IEnumerable<ETicket.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Movie Categories</h1>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Category Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                <tr>
+                    <td>@category.Name</td>
+                    <td>
+                        <a asp-controller="Category" asp-action="Movies" asp-route-CategoryId="@category.Id"
+                           class="btn btn-primary btn-sm">
+                            View Movies
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

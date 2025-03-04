@@ -1,0 +1,32 @@
+﻿@model IEnumerable<ETicket.Models.Cinema>
+
+@{
+    ViewData["Title"] = "Cinemas";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Cinemas</h1>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Cinema Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cinema in Model)
+            {
+                <tr>
+                    <td>@cinema.Name</td>
+                    <td>
+                        <a asp-controller="Cinema" asp-action="Movies" asp-route-CinemaId="@cinema.Id"
+                           class="btn btn-primary btn-sm">
+                            View Movies
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

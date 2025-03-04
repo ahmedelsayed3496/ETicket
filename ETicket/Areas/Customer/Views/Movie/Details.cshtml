@@ -1,0 +1,158 @@
+﻿@model ETicket.Models.Movie
+
+@{
+    ViewData["Title"] = Model.Name;
+    var movieStatus = Model.EndDate < DateTime.Now ? "Expired" : "Now Showing";
+}
+
+<div class="container mt-5">
+    <!-- Movie Name as Header -->
+    <h1>@Model.Name</h1>
+
+    <div class="row mt-4">
+        <!-- Movie Poster -->
+        <div class="col-md-4">
+            <img src="@Url.Content($"~/images/movies/{Model.ImgUrl}")" asp-append-version="true" class="img-fluid rounded shadow" alt="@Model.Name">
+        </div>
+
+        <!-- Movie Details -->
+        <div class="col-md-8">
+            <h4>Description</h4>
+            <p>@Model.Description</p>
+
+            <h5 class="mt-3">
+                Status:
+                <span class="badge @(Model.EndDate < DateTime.Now ? "bg-danger" : "bg-success")">
+                    @movieStatus
+                </span>
+            </h5>
+            <h5>Price: <span class="text-success">$@Model.Price</span></h5>
+
+            <!-- Clickable Cinema -->
+            <h5>
+                Cinema:
+                <a asp-controller="Cinema" asp-action="Movies" asp-route-CinemaId="@Model.Cinema.Id"
+                   class="badge bg-primary text-decoration-none">
+                    @Model.Cinema.Name
+                </a>
+            </h5>
+
+            <h5>Start Date: <span class="text-secondary">@Model.StartDate.ToShortDateString()</span></h5>
+            <h5>End Date: <span class="text-secondary">@Model.EndDate.ToShortDateString()</span></h5>
+
+            <!-- Clickable Category -->
+            <h5>
+                Category:
+                <a asp-controller="Category" asp-action="Movies" asp-route-CategoryId="@Model.Category.Id"
+                   class="badge bg-dark text-decoration-none">
+                    @Model.Category.Name
+                </a>
+            </h5>
+
+            <!-- Actors -->
+            <h5 class="mt-3">Actors</h5>
+            <div class="d-flex">
+                @if (ViewData["actors"] is List<ETicket.Models.Actor> actors && actors.Any())
+                {
+                    @foreach (var actor in actors)
+                    {
+                        <div class="text-center me-3">
+                            <a asp-controller="Actor" asp-action="Works" asp-route-ActorId="@actor.Id">
+                                <img src="@Url.Content($"~/images/cast/{actor.ProfilePicture}")" asp-append-version="true"
+                                     class="rounded-circle border" width="60" height="60" alt="@actor.FirstName">
+                            </a>
+                            <p class="small">@actor.FirstName</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No actors available.</p>
+                }
+            </div>
+
+            <!-- Booking Button (Disabled if Expired) -->
+            <div class="mt-4">
+                <a href="#" class="btn @(Model.EndDate < DateTime.Now ? "btn-secondary disabled" : "btn-primary") btn-lg">
+                    Book a Ticket
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trailer Section -->
+    <div class="mt-4">
+        <h5>Trailer</h5>
+        <video controls class="rounded shadow w-50">
+            <source src="@Url.Content($"~/videos/{Model.TrailerUrl}")" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Related Movies Section -->
+    @if (ViewBag.RelatedMovies is List<ETicket.Models.Movie> relatedMovies && relatedMovies.Any())
+    {
+        <div class="mt-5">
+            <h3 class="text-center">Related Movies</h3>
+            <div class="row">
+                @foreach (var movie in relatedMovies)
+                {
+                    var relatedMovieStatus = movie.EndDate < DateTime.Now ? "Expired" : "Now Showing";
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 position-relative">
+                            <!-- Status Badge -->
+                            <div class="position-absolute top-0 end-0 p-2">
+                                <span class="badge @(movie.EndDate < DateTime.Now ? "bg-danger" : "bg-success") fs-6 p-2">
+                                    @relatedMovieStatus
+                                </span>
+                            </div>
+
+                            <!-- Movie Image -->
+                            <img src="@Url.Content($"~/images/movies/{movie.ImgUrl}")" class="card-img-top" alt="@movie.Name" style="height: 250px; object-fit: cover;">
+
+                            <div class="card-body">
+                                <h5 class="card-title">@movie.Name</h5>
+                                <p class="fw-bold">Price: $@movie.Price</p>
+
+                                <!-- Clickable Cinema -->
+                                <p>
+                                    <strong>Cinema:</strong>
+                                    <a asp-controller="Cinema" asp-action="Movies" asp-route-CinemaId="@movie.Cinema.Id"
+                                       class="badge bg-primary text-decoration-none">
+                                        @movie.Cinema.Name
+                                    </a>
+                                </p>
+
+                                <p><small class="text-muted">Start Date: @movie.StartDate.ToString("MMMM dd, yyyy")</small></p>
+                                <p><small class="text-muted">End Date: @movie.EndDate.ToString("MMMM dd, yyyy")</small></p>
+
+                                <!-- Clickable Category -->
+                                <p>
+                                    <strong>Category:</strong>
+                                    <a asp-controller="Category" asp-action="Movies" asp-route-CategoryId="@movie.Category.Id"
+                                       class="badge bg-dark text-decoration-none">
+                                        @movie.Category.Name
+                                    </a>
+                                </p>
+                            </div>
+
+                            <!-- Card Footer (Buttons) -->
+                            <div class="card-footer d-flex justify-content-between">
+                                <a href="#" class="btn @(movie.EndDate < DateTime.Now ? "btn-secondary disabled" : "btn-primary") w-50 me-2">Get Ticket</a>
+                                <a asp-controller="Movie" asp-action="Details" asp-route-MovieId="@movie.Id"
+                                   class="btn btn-outline-primary w-50">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-center mt-4">No related movies available.</p>
+    }
+</div>

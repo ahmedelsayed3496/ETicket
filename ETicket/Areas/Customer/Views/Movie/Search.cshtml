@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ETicket.Models.Movie>
+@using ETicket.Data.Enums  <!-- Import your enum namespace -->
+@{
+    ViewData["Title"] = "Search Results";
+    var searchQuery = ViewData["SearchQuery"] as string;
+}
+
+<div class="container mt-5">
+    <!-- Search Title -->
+    <h1 class="text-center">Search Results for "@searchQuery"</h1>
+
+    @if (!Model.Any())
+    {
+        <p class="text-center mt-4">No movies found matching "@searchQuery".</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var movie in Model)
+            {
+                var movieStatus = movie.StartDate > DateTime.Now ? MovieStatus.Upcoming
+                : (movie.EndDate >= DateTime.Now ? MovieStatus.Available : MovieStatus.Expired);
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 position-relative">
+                        <!-- Status Badge -->
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <span class="badge @(movieStatus == MovieStatus.Available ? "bg-success" : movieStatus == MovieStatus.Upcoming ? "bg-warning" : "bg-danger") fs-6 p-2">
+                                @(movieStatus == MovieStatus.Available ? "Now Showing" : movieStatus == MovieStatus.Upcoming ? "Upcoming" : "Expired")
+                            </span>
+                        </div>
+
+                        <!-- Movie Image -->
+                        <img src="@Url.Content($"~/images/movies/{movie.ImgUrl}")" class="card-img-top"
+                             alt="@movie.Name" style="height: 250px; object-fit: cover;">
+
+                        <div class="card-body">
+                            <h5 class="card-title">@movie.Name</h5>
+
+                            <!-- Clickable Cinema -->
+                            <p>
+                                <strong>Cinema:</strong>
+                                <a asp-controller="Cinema" asp-action="Movies" asp-route-CinemaId="@movie.Cinema.Id"
+                                   class="badge bg-primary text-decoration-none">
+                                    @movie.Cinema.Name
+                                </a>
+                            </p>
+
+                            <p class="fw-bold">Price: $@movie.Price</p>
+                            <p><small class="text-muted">Start Date: @movie.StartDate.ToString("MMMM dd, yyyy")</small></p>
+                            <p><small class="text-muted">End Date: @movie.EndDate.ToString("MMMM dd, yyyy")</small></p>
+
+                            <!-- Clickable Category -->
+                            <p>
+                                <strong>Category:</strong>
+                                <a asp-controller="Category" asp-action="Movies" asp-route-CategoryId="@movie.Category.Id"
+                                   class="badge bg-dark text-decoration-none">
+                                    @movie.Category.Name
+                                </a>
+                            </p>
+                        </div>
+
+                        <!-- Card Footer (Buttons) -->
+                        <div class="card-footer d-flex justify-content-between">
+                            <a href="#" class="btn @(movieStatus == MovieStatus.Expired ? "btn-secondary disabled" : "btn-primary") w-50 me-2">Get Ticket</a>
+                            <a asp-controller="Movie" asp-action="Details" asp-route-MovieId="@movie.Id"
+                               class="btn btn-outline-primary w-50">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
