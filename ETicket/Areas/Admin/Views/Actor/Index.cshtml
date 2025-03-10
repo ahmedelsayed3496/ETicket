@@ -1,0 +1,81 @@
+﻿@model IEnumerable<ETicket.Models.Actor>
+
+@{
+    ViewData["Title"] = "Actors";
+}
+
+<div class="container mt-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    <h2 class="mb-4">Actors</h2>
+
+    <a asp-area="Admin" asp-controller="Actor" asp-action="Create" class="btn btn-primary mb-3">Add New Actor</a>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Profile Picture</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var actor in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(actor.ProfilePicture))
+                            {
+                                <img src="~/images/cast/@actor.ProfilePicture" alt="@actor.FirstName @actor.LastName" class="img-fluid rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <img src="~/images/default-avatar.png" alt="No Image" class="img-fluid rounded-circle" style="width: 60px; height: 60px;">
+                            }
+                        </td>
+                        <td>@actor.FirstName @actor.LastName</td>
+                        <td>
+                            <a href="@Url.Action("Edit", "Actor", new { id = actor.Id })" class="btn btn-warning btn-sm">Edit</a>
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="@actor.Id" data-name="@actor.FirstName @actor.LastName">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SweetAlert Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Attach event listeners to delete buttons
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function (e) {
+            const actorId = e.target.getAttribute('data-id');
+            const actorName = e.target.getAttribute('data-name');
+
+            // Show confirmation dialog with SweetAlert
+            Swal.fire({
+                title: `Are you sure you want to delete ${actorName}?`,
+                text: "This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to delete action
+                    window.location.href = `/Admin/Actor/Delete/${actorId}`;
+                }
+            });
+        });
+    });
+</script>

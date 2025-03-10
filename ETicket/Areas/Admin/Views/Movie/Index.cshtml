@@ -1,0 +1,84 @@
+﻿@model List<ETicket.Models.Movie>
+
+@{
+    ViewData["Title"] = "Movies - Admin Panel";
+}
+
+<div class="container mt-4 mx-auto" style="max-width: 90%;">
+    <!-- ✅ Success message (disappears after 5 seconds) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div id="successMessage" class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <h2 class="mb-4">Movies Management</h2>
+
+    <a asp-area="Admin" asp-controller="Movie" asp-action="Create" class="btn btn-primary mb-3">Create New Movie</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Cinema</th>
+                <th>Price</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in Model)
+            {
+                <tr>
+                    <td>@movie.Name</td>
+                    <td>@movie.Category.Name</td>
+                    <td>@movie.Cinema.Name</td>
+                    <td>$@movie.Price</td>
+                    <td>@movie.StartDate.ToShortDateString()</td>
+                    <td>@movie.EndDate.ToShortDateString()</td>
+                    <td>@movie.MovieStatus</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="Movie" asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-warning btn-sm">Edit</a>
+
+                        <button onclick="confirmDelete(@movie.Id)" class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        // ✅ Hide success message after 5 seconds
+        setTimeout(function () {
+            var message = document.getElementById("successMessage");
+            if (message) {
+                message.style.transition = "opacity 0.5s";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500);
+            }
+        }, 5000);
+
+        // ✅ SweetAlert2 Delete Confirmation
+        function confirmDelete(movieId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This movie and its files will be permanently deleted!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/Admin/Movie/Delete?movieId=" + movieId;
+                }
+            });
+        }
+    </script>
+}

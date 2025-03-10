@@ -1,0 +1,118 @@
+﻿@model ETicket.Models.Movie
+@{
+    ViewData["Title"] = "Create Movie";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Create New Movie</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Movie Name</label>
+                            <input type="text" name="Name" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Description" class="form-label">Description</label>
+                            <textarea name="Description" class="form-control" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Price" class="form-label">Price</label>
+                            <input type="number" name="Price" class="form-control" step="0.01" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="StartDate" class="form-label">Start Date</label>
+                            <input type="date" name="StartDate" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="EndDate" class="form-label">End Date</label>
+                            <input type="date" name="EndDate" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="CinemaId" class="form-label">Select Cinema</label>
+                            <select name="CinemaId" class="form-select">
+                                @foreach (var item in ViewBag.Cinemas as List<Cinema>)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="CategoryId" class="form-label">Select Category</label>
+                            <select name="CategoryId" class="form-select">
+                                @foreach (var item in ViewBag.Categories as List<Category>)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Actors</label>
+                            <select name="ActorIds" class="form-select" multiple>
+                                @foreach (var item in ViewBag.Actors as List<Actor>)
+                                {
+                                    <option value="@item.Id">@item.FirstName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload Movie Poster</label>
+                            <input type="file" name="ImageFile" class="form-control" id="imgUpload" />
+                            <img id="imgPreview" class="img-thumbnail mt-2" style="max-width: 200px; display: none;" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload Trailer Video</label>
+                            <input type="file" name="TrailerFile" class="form-control" id="trailerUpload" />
+                            <video id="trailerPreview" controls class="mt-2" style="max-width: 100%; display: none;">
+                                <source src="#" type="video/mp4" />
+                            </video>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success me-2">Create</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("imgUpload").addEventListener("change", function (event) {
+            let reader = new FileReader();
+            reader.onload = function () {
+                document.getElementById("imgPreview").src = reader.result;
+                document.getElementById("imgPreview").style.display = "block";
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+
+        document.getElementById("trailerUpload").addEventListener("change", function (event) {
+            let file = event.target.files[0];
+            if (file) {
+                let trailerPreview = document.getElementById("trailerPreview");
+                trailerPreview.querySelector("source").src = URL.createObjectURL(file);
+                trailerPreview.load();
+                trailerPreview.style.display = "block";
+            }
+        });
+    </script>
+}

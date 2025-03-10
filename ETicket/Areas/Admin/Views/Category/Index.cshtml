@@ -1,0 +1,95 @@
+﻿@model List<ETicket.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories - Admin Panel";
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+
+<div class="container mt-4 mx-auto" style="max-width: 90%;">
+    <!-- ✅ Success message (disappears after 5 seconds) -->
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div id="successMessage" class="alert alert-success">
+            @successMessage
+        </div>
+    }
+
+    <!-- ✅ Error message -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div id="errorMessage" class="alert alert-danger">
+            @errorMessage
+        </div>
+    }
+
+    <h2 class="mb-4">Categories Management</h2>
+
+    <a asp-area="Admin" asp-controller="Category" asp-action="Create" class="btn btn-primary mb-3">Create New Category</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                <tr>
+                    <td>@category.Id</td>
+                    <td>@category.Name</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <button onclick="confirmDelete(@category.Id)" class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        // ✅ Hide success & error messages after 5 seconds
+        setTimeout(function () {
+            var successMessage = document.getElementById("successMessage");
+            if (successMessage) {
+                successMessage.style.transition = "opacity 0.5s";
+                successMessage.style.opacity = "0";
+                setTimeout(() => successMessage.remove(), 500);
+            }
+
+            var errorMessage = document.getElementById("errorMessage");
+            if (errorMessage) {
+                errorMessage.style.transition = "opacity 0.5s";
+                errorMessage.style.opacity = "0";
+                setTimeout(() => errorMessage.remove(), 500);
+            }
+        }, 5000);
+
+        // ✅ SweetAlert2 Delete Confirmation
+        function confirmDelete(categoryId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This category will be permanently deleted!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ✅ Create and submit a form for deletion
+                    var form = document.createElement("form");
+                    form.method = "post";
+                    form.action = "/Admin/Category/Delete/" + categoryId;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    </script>
+}

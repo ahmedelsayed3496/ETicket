@@ -1,0 +1,77 @@
+﻿@model ETicket.Models.Cinema
+
+@{
+    ViewData["Title"] = "Edit Cinema";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white text-center">
+                    <h4 class="mb-0">Edit Cinema</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-area="Admin" asp-controller="Cinema" asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Name" class="form-label fw-bold">Cinema Name</label>
+                                    <input asp-for="Name" class="form-control shadow-sm" required />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Description" class="form-label fw-bold">Description</label>
+                                    <textarea asp-for="Description" class="form-control shadow-sm" rows="3" required></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Address" class="form-label fw-bold">Address</label>
+                                    <input asp-for="Address" class="form-control shadow-sm" required />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3 text-center">
+                                    <label class="form-label fw-bold">Upload New Logo</label>
+                                    <input type="file" name="ImageFile" class="form-control shadow-sm" id="imgUpload" accept="image/*" />
+                                    <span asp-validation-for="CinemaLogo" class="text-danger"></span>
+
+                                    <div class="mt-3">
+                                        <img id="imgPreview" src="~/images/cinemas/@Model.CinemaLogo" class="img-thumbnail" style="max-width: 250px;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-warning text-white me-2 px-4">Update</button>
+                            <a asp-action="Index" class="btn btn-secondary px-4">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("imgUpload").addEventListener("change", function (event) {
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function () {
+                    let imgPreview = document.getElementById("imgPreview");
+                    imgPreview.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

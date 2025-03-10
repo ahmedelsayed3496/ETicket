@@ -1,0 +1,85 @@
+﻿@model List<ETicket.Models.Cinema>
+
+@{
+    ViewData["Title"] = "Cinemas - Admin Panel";
+}
+
+<div class="container mt-4 mx-auto" style="max-width: 90%;">
+    <!-- ✅ Success Message (disappears after 5 seconds) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div id="successMessage" class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <h2 class="mb-4">Edit Cinemas</h2>
+
+    <a asp-area="Admin" asp-controller="Cinema" asp-action="Create" class="btn btn-primary mb-3">Create New Cinema</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Logo</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cinema in Model)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(cinema.CinemaLogo))
+                        {
+                            <img src="~/images/cinemas/@cinema.CinemaLogo" class="img-thumbnail" style="max-width: 80px;">
+                        }
+                        else
+                        {
+                            <span class="text-muted">No Image</span>
+                        }
+                    </td>
+                    <td>@cinema.Name</td>
+                    <td>@cinema.Address</td>
+                    <td>
+                        <a asp-area="Admin" asp-controller="Cinema" asp-action="Edit" asp-route-id="@cinema.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <button onclick="confirmDelete(@cinema.Id)" class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- ✅ JavaScript to handle success message & delete confirmation -->
+@section Scripts {
+    <script>
+        // ✅ Hide success message after 5 seconds
+        setTimeout(function () {
+            var message = document.getElementById("successMessage");
+            if (message) {
+                message.style.transition = "opacity 0.5s";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500); // Remove after fade out
+            }
+        }, 5000);
+
+        // ✅ Delete confirmation with SweetAlert
+        function confirmDelete(cinemaId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This cinema will be permanently deleted!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/Admin/Cinema/Delete/" + cinemaId;
+                }
+            });
+        }
+    </script>
+}

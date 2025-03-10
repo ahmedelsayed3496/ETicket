@@ -17,6 +17,36 @@ namespace ETicket.Repositories
             dbSet = dbContext.Set<T>();
         }
 
+        public void Create(T entity)
+        {
+            dbSet.Add(entity);
+        }
+
+        public void Create(List<T> entities)
+        {
+            dbSet.AddRange(entities);
+        }
+
+        public void Edit(T entity)
+        {
+            dbSet.Update(entity);
+        }
+
+        public void Delete(T entity)
+        {
+            dbSet.Remove(entity);
+        }
+
+        public void Delete(List<T> entities)
+        {
+            dbSet.RemoveRange(entities);
+        }
+
+        public void Commit()
+        {
+            dbContext.SaveChanges();
+        }
+
 
         public IEnumerable<T> Get(Expression<Func<T, bool>>? filter = null, Expression<Func<T, object>>[]? includes = null, bool tracked = true)
         {
